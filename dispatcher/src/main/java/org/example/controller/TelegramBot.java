@@ -9,6 +9,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.annotation.PostConstruct;
+
 @Component
 @Log4j
 public class TelegramBot extends TelegramLongPollingBot {
@@ -18,6 +20,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Value("${bot.token}") //подключение зависимости смотреть application.properties
     private String botToken;
+
+    private UpdateController updateController;
+
+    public TelegramBot(UpdateController updateController) {
+        this.updateController = updateController;
+    }
+
+    @PostConstruct
+    public void init() {
+        updateController.registerBot(this);
+    }
 
     /**
      * подключение ручного логгера, изменяем на бибилиотеку Lombok
@@ -37,7 +50,7 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     @Override
     public String getBotToken() {
-        return botToken;
+       return botToken;
     }
 
     /**
@@ -46,6 +59,8 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     @Override
     public void onUpdateReceived(Update update) {
+        updateController.processUpdate(update);
+        /**
         var originalMessage = update.getMessage();
         log.debug(originalMessage.getText());
 
@@ -53,6 +68,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         response.setChatId(originalMessage.getChatId().toString());
         response.setText("Hello, I'm Telegram Bot");
         sendAnswerMessage(response);
+         */
     }
 
     public void sendAnswerMessage(SendMessage message) {
