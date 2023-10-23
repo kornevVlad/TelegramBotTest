@@ -28,3 +28,6 @@
 2023-10-21 14:53:41 DEBUG UpdateProducerImpl:21 - k
 2023-10-21 15:51:54 DEBUG UpdateProducerImpl:21 - h
 2023-10-21 15:54:21 DEBUG UpdateProducerImpl:21 - h
+2023-10-23 12:01:29 DEBUG UpdateProducerImpl:21 - hello from chat
+2023-10-23 12:07:08 DEBUG UpdateProducerImpl:21 - hello
+2023-10-23 12:07:27 DEBUG UpdateProducerImpl:21 - 

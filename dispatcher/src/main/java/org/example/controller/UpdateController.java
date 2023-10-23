@@ -71,7 +71,7 @@ public class UpdateController {
     /**
      * генерация ответа в бот
      */
-    private void setView(SendMessage sendMassage) {
+    public void setView(SendMessage sendMassage) {
         telegramBot.sendAnswerMessage(sendMassage);
     }
 
@@ -87,7 +87,7 @@ public class UpdateController {
 
     private void processTextMassage(Update update) {
         updateProducer.produce(TEXT_MASSAGE_UPDATE, update);
-        setFileIsReceivedView(update);
+       // setFileIsReceivedView(update);
     }
 
     /**
