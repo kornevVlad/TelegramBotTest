@@ -1,0 +1,33 @@
+2023-10-17 12:36:56 DEBUG TelegramBot:33 - hello
+2023-10-17 12:54:46 DEBUG TelegramBot:44 - hi
+2023-10-17 13:04:08 DEBUG TelegramBot:49 - hi
+2023-10-17 13:04:08 ERROR TelegramBot:62 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+2023-10-17 13:05:06 DEBUG TelegramBot:49 - рш
+2023-10-17 13:05:06 ERROR TelegramBot:62 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+2023-10-17 13:05:15 DEBUG TelegramBot:49 - hi
+2023-10-17 13:05:15 ERROR TelegramBot:62 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+2023-10-17 13:10:08 DEBUG TelegramBot:50 - hi
+2023-10-17 13:10:08 ERROR TelegramBot:63 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+2023-10-17 13:10:16 DEBUG TelegramBot:50 - hi
+2023-10-17 13:10:17 ERROR TelegramBot:63 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+2023-10-17 13:23:11 DEBUG TelegramBot:50 - hi
+2023-10-17 13:23:11 ERROR TelegramBot:63 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+2023-10-18 11:22:46 DEBUG TelegramBot:50 - hi
+2023-10-18 11:22:46 ERROR TelegramBot:63 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
+2023-10-18 11:37:22 DEBUG TelegramBot:50 - hi
+2023-10-18 13:29:34 DEBUG UpdateProducerImpl:14 - hi
+2023-10-18 13:30:58 DEBUG UpdateProducerImpl:14 - 
+2023-10-18 13:31:35 DEBUG UpdateProducerImpl:14 - 
+2023-10-19 12:02:06 DEBUG UpdateProducerImpl:14 - 111
+2023-10-19 12:16:16 DEBUG UpdateProducerImpl:14 - 1
+2023-10-21 14:15:04 DEBUG UpdateProducerImpl:21 - hello
+2023-10-21 14:21:55 DEBUG UpdateProducerImpl:21 - g
+2023-10-21 14:27:52 DEBUG UpdateProducerImpl:21 - 5
+2023-10-21 14:48:02 DEBUG UpdateProducerImpl:21 - hi
+2023-10-21 14:52:56 DEBUG UpdateProducerImpl:21 - j
+2023-10-21 14:53:41 DEBUG UpdateProducerImpl:21 - k
+2023-10-21 15:51:54 DEBUG UpdateProducerImpl:21 - h
+2023-10-21 15:54:21 DEBUG UpdateProducerImpl:21 - h
+2023-10-23 12:01:29 DEBUG UpdateProducerImpl:21 - hello from chat
+2023-10-23 12:07:08 DEBUG UpdateProducerImpl:21 - hello
+2023-10-23 12:07:27 DEBUG UpdateProducerImpl:21 - 
