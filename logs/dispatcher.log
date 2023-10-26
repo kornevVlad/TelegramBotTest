@@ -31,3 +31,5 @@
 2023-10-23 12:01:29 DEBUG UpdateProducerImpl:21 - hello from chat
 2023-10-23 12:07:08 DEBUG UpdateProducerImpl:21 - hello
 2023-10-23 12:07:27 DEBUG UpdateProducerImpl:21 - 
+2023-10-26 12:00:47 DEBUG UpdateProducerImpl:21 - Hello from Node
+2023-10-26 12:02:44 DEBUG UpdateProducerImpl:21 - Hello Vlad
