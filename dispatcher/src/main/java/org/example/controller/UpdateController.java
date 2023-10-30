@@ -35,7 +35,7 @@ public class UpdateController {
             return;
         }
 
-        if (update.getMessage() != null) {
+        if (update.hasMessage()) {
             distributeMassageByType(update);
         } else {
             log.error("Unsupported type");
@@ -48,11 +48,11 @@ public class UpdateController {
     public void distributeMassageByType(Update update) {
         var massage = update.getMessage();
 
-        if (massage.getText() != null) {
+        if (massage.hasText()) {
             processTextMassage(update);
-        } else if (massage.getDocument() != null) {
+        } else if (massage.hasDocument()) {
             processDocumentMassage(update);
-        } else if (massage.getPhoto() != null) {
+        } else if (massage.hasPhoto()) {
             processPhotoMassage(update);
         } else {
             setUnsupportedMassageTypeView(update);
