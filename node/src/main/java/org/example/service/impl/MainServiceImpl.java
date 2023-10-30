@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDao;
 import org.example.dao.RawDataDao;
 import org.example.entity.AppUser;
@@ -12,8 +13,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import static org.example.entity.enams.UserState.BASIC_STATE;
+import static org.example.entity.enams.UserState.WAIT_FOR_EMAIL_STATE;
+import static org.example.service.enums.ServiceCommands.*;
 
 @Service
+@Log4j
 public class MainServiceImpl implements MainService {
 
     private final RawDataDao rawDataDao;
@@ -32,16 +36,114 @@ public class MainServiceImpl implements MainService {
     public void processTextMassage(Update update) {
         saveRawData(update);
 
-        var massage = update.getMessage();
-        var sendMassage = new SendMessage();
+        var appUser = findOrSaveAppUser(update);
+        var userState = appUser.getState();
+        var text = update.getMessage().getText();
+        var output = "";
 
-        var textMassage = update.getMessage();
-        var telegramUser = textMassage.getFrom();
-        var appUser = findOrSaveAppUser(telegramUser);
+        /**
+         * проверка входящих команд
+         */
+        if (CANCEL.equals(text)) {
+            output = cancelProcess(appUser);
+        } else if (BASIC_STATE.equals(userState)) {
+            output = processServiceCommand(appUser, text);
+        } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
+            //TODO добавить обработку email пользователя
+        } else {
+            log.error("Unknown user state" + userState);
+            output = "Неизвестная ошибка! Введите /cancel и повторите снова.";
+        }
 
-        sendMassage.setChatId(massage.getChatId().toString());
-        sendMassage.setText("Hello from NODE");
-        producerService.producerAnswer(sendMassage);
+        var chatId = update.getMessage().getChatId();
+        sendAnswer(output, chatId);
+
+    }
+
+    @Override
+    public void processDocMassage(Update update) {
+        saveRawData(update);
+        var appUser = findOrSaveAppUser(update);
+        var chatId = update.getMessage().getChatId();
+        if (isNotAllowSendContent(chatId, appUser)) {
+            return;
+        }
+        //TODO добавить сохранение документа
+        var answer = "Документ успешно загружен! Ссылка для скачивания: http://test-ru";
+
+        sendAnswer(answer, chatId);
+    }
+
+    private boolean isNotAllowSendContent(Long chatId, AppUser appUser) {
+        var userState = appUser.getState();
+        if (!appUser.getIsActive()) {
+            var error = "Зарегистрируйтесь или подтвердите почту по ссылке на почту для загрузки контента";
+            sendAnswer(error, chatId);
+            return true;
+        } else if (!BASIC_STATE.equals(userState)) {
+            var error = "Отмените текущее действие командой /cancel для отправки файлов";
+            sendAnswer(error, chatId);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void processPhotoMassage(Update update) {
+        saveRawData(update);
+        var appUser = findOrSaveAppUser(update);
+        var chatId = update.getMessage().getChatId();
+        if (isNotAllowSendContent(chatId, appUser)) {
+            return;
+        }
+        //TODO добавить сохранение фото
+        var answer = "Фото успешно загружен! Ссылка для скачивания: http://test-ru";
+
+        sendAnswer(answer, chatId);
+    }
+
+    /**
+     * отправка сообщения обратно в чат пользователю
+     */
+    private void sendAnswer(String output, Long chatId) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(output);
+        producerService.producerAnswer(sendMessage);
+    }
+
+    /**
+     * обработка входящик команд от бота
+     */
+    private String processServiceCommand(AppUser appUser, String cmd) {
+        if (REGISTRATION.equals(cmd)) {
+            //TODO функионал не создан, добавить регистрацию
+            return "Временно не доступен";
+        } else if (HELP.equals(cmd)) {
+            return help();
+        } else if (START.equals(cmd)) {
+            return "Приветствуем! Доступный список команд введите /help";
+        } else {
+            return "Неизвестная команда! Доступный список команд введите /help";
+        }
+    }
+
+    /**
+     * вывод списка доступных команд
+     */
+    private String help() {
+        return "Список достпупных команд:\n"
+                + "/cancel - отмена выполнения текущей команды \n"
+                + "/registration - регистрация пользователя";
+    }
+
+    /**
+     * завершение команды
+     */
+    private String cancelProcess(AppUser appUser) {
+        appUser.setState(BASIC_STATE);
+        appUserDao.save(appUser);
+        return "Команда отменена";
     }
 
     /**
@@ -57,7 +159,8 @@ public class MainServiceImpl implements MainService {
     /**
      * проверка пользователя на ID
      */
-    private AppUser findOrSaveAppUser(User telegramUser) {
+    private AppUser findOrSaveAppUser(Update update) {
+        User telegramUser = update.getMessage().getFrom();
         AppUser persistansAppUser = appUserDao.findAppUserByTelegramUserId(telegramUser.getId());
         if(persistansAppUser == null) {
             //пользователь не найден, предстоящее сохранение
