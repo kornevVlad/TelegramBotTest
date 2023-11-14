@@ -1,18 +1,17 @@
 package org.example.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.entity.enams.UserState;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.TypeDef;
-import org.springframework.data.annotation.CreatedDate;
+
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -3,10 +3,15 @@ package org.example.service.impl;
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDao;
 import org.example.dao.RawDataDao;
+import org.example.entity.AppDocument;
+import org.example.entity.AppPhoto;
 import org.example.entity.AppUser;
 import org.example.entity.RawData;
+import org.example.exceptions.UploadFileException;
+import org.example.service.FileService;
 import org.example.service.MainService;
 import org.example.service.ProducerService;
+import org.example.service.enums.ServiceCommands;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -26,10 +31,16 @@ public class MainServiceImpl implements MainService {
 
     private final AppUserDao appUserDao;
 
-    public MainServiceImpl(RawDataDao rawDataDao, ProducerService producerService, AppUserDao appUserDao) {
+    private final FileService fileService;
+
+
+
+    public MainServiceImpl(RawDataDao rawDataDao, ProducerService producerService, AppUserDao appUserDao
+    ,FileService fileService) {
         this.rawDataDao = rawDataDao;
         this.producerService = producerService;
         this.appUserDao = appUserDao;
+        this.fileService = fileService;
     }
 
     @Override
@@ -44,7 +55,8 @@ public class MainServiceImpl implements MainService {
         /**
          * проверка входящих команд
          */
-        if (CANCEL.equals(text)) {
+        var serviceCommand = ServiceCommands.fromValue(text);
+        if (CANCEL.equals(serviceCommand)) {
             output = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
             output = processServiceCommand(appUser, text);
@@ -67,6 +79,17 @@ public class MainServiceImpl implements MainService {
         var chatId = update.getMessage().getChatId();
         if (isNotAllowSendContent(chatId, appUser)) {
             return;
+        }
+
+        try {
+
+            AppDocument doc = fileService.processDoc(update.getMessage());
+            var answer = "Документ успешно загружен! Ссылка для скачивания: http://test-ru";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException e) {
+            log.error(e);
+            String error = "К сожалению загрузка файла не удалась. Повторите попытку позже....";
+            sendAnswer(error, chatId);
         }
         //TODO добавить сохранение документа
         var answer = "Документ успешно загружен! Ссылка для скачивания: http://test-ru";
@@ -96,10 +119,17 @@ public class MainServiceImpl implements MainService {
         if (isNotAllowSendContent(chatId, appUser)) {
             return;
         }
-        //TODO добавить сохранение фото
-        var answer = "Фото успешно загружен! Ссылка для скачивания: http://test-ru";
 
-        sendAnswer(answer, chatId);
+        try {
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            //TODO добавить генерацию ссылки на скачивание
+            var answer = "Фото успешно загружено! Ссылка для скачивания: http://test-ru";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException e) {
+            log.error(e);
+            String error = "К сожалению загрузка фото не удалась. Повторите попытку позже....";
+            sendAnswer(error, chatId);
+        }
     }
 
     /**

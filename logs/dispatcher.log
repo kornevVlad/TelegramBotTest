@@ -34,3 +34,13 @@
 2023-10-26 12:00:47 DEBUG UpdateProducerImpl:21 - Hello from Node
 2023-10-26 12:02:44 DEBUG UpdateProducerImpl:21 - Hello Vlad
 2023-10-30 12:43:45 DEBUG UpdateProducerImpl:21 - Hello common JPA
+2023-10-30 14:09:26 DEBUG UpdateProducerImpl:21 - руу
+2023-10-30 14:11:47 DEBUG UpdateProducerImpl:21 - /help
+2023-10-30 14:11:56 DEBUG UpdateProducerImpl:21 - /help
+2023-10-30 14:13:21 DEBUG UpdateProducerImpl:21 - /cancel
+2023-10-30 14:13:25 DEBUG UpdateProducerImpl:21 - /help
+2023-10-31 14:00:49 DEBUG UpdateProducerImpl:21 - привет
+2023-10-31 14:01:07 DEBUG UpdateProducerImpl:21 - 
+2023-10-31 15:03:03 DEBUG UpdateProducerImpl:21 - /help
+2023-11-14 11:20:33 DEBUG UpdateProducerImpl:21 - 
+2023-11-14 12:24:02 DEBUG UpdateProducerImpl:21 - 
