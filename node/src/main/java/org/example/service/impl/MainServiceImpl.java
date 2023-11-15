@@ -11,6 +11,7 @@ import org.example.exceptions.UploadFileException;
 import org.example.service.FileService;
 import org.example.service.MainService;
 import org.example.service.ProducerService;
+import org.example.service.enums.LinkType;
 import org.example.service.enums.ServiceCommands;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -82,19 +83,19 @@ public class MainServiceImpl implements MainService {
         }
 
         try {
-
             AppDocument doc = fileService.processDoc(update.getMessage());
-            var answer = "Документ успешно загружен! Ссылка для скачивания: http://test-ru";
+            String link = fileService.generateLink(doc.getId(), LinkType.GET_DOC);
+            var answer = "Документ успешно загружен! Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException e) {
             log.error(e);
             String error = "К сожалению загрузка файла не удалась. Повторите попытку позже....";
             sendAnswer(error, chatId);
         }
-        //TODO добавить сохранение документа
+       /*  //TODO добавить сохранение документа
         var answer = "Документ успешно загружен! Ссылка для скачивания: http://test-ru";
 
-        sendAnswer(answer, chatId);
+        sendAnswer(answer, chatId);*/
     }
 
     private boolean isNotAllowSendContent(Long chatId, AppUser appUser) {
@@ -122,8 +123,8 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppPhoto photo = fileService.processPhoto(update.getMessage());
-            //TODO добавить генерацию ссылки на скачивание
-            var answer = "Фото успешно загружено! Ссылка для скачивания: http://test-ru";
+            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
+            var answer = "Фото успешно загружено! Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException e) {
             log.error(e);
