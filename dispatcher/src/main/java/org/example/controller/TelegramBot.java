@@ -50,7 +50,7 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     @Override
     public String getBotToken() {
-       return botToken;
+           return botToken;
     }
 
     /**

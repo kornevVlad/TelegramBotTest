@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @Log4j
 @RequestMapping("/file")
 @RestController
@@ -21,21 +24,26 @@ public class FileController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/get-doc")
-    public ResponseEntity<?> getDoc(@RequestParam("id") String id) {
+    public void getDoc(@RequestParam("id") String id, HttpServletResponse response) {
         var doc = fileService.getDocument(id);
         if (doc == null) {
-            return ResponseEntity.badRequest().build();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
-        var binaryContent = doc.getBinaryContent();
-        var fileSystemResource = fileService.getFileSystemResource(binaryContent);
+        response.setContentType(MediaType.parseMediaType(doc.getMimeType()).toString());
+        response.setHeader("Content-disposition", "attachment: file =" + doc.getDocName());
+        response.setStatus(HttpServletResponse.SC_OK);
 
-        if (fileSystemResource == null) {
-            return ResponseEntity.internalServerError().build();
+        var binaryContent = doc.getBinaryContent();
+
+        try {
+            var out = response.getOutputStream();
+            out.write(binaryContent.getFileAsArrayOfBytes());
+            out.close();
+        } catch (IOException e) {
+            log.error(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(doc.getMimeType()))
-                .header("Content-disposition", "attachment: file =" + doc.getDocName())
-                .body(fileSystemResource);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/get-photo")

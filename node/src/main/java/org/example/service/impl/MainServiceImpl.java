@@ -8,6 +8,7 @@ import org.example.entity.AppPhoto;
 import org.example.entity.AppUser;
 import org.example.entity.RawData;
 import org.example.exceptions.UploadFileException;
+import org.example.service.AppUserService;
 import org.example.service.FileService;
 import org.example.service.MainService;
 import org.example.service.ProducerService;
@@ -34,14 +35,17 @@ public class MainServiceImpl implements MainService {
 
     private final FileService fileService;
 
+    private final AppUserService appUserService;
+
 
 
     public MainServiceImpl(RawDataDao rawDataDao, ProducerService producerService, AppUserDao appUserDao
-    ,FileService fileService) {
+    , FileService fileService, AppUserService appUserService) {
         this.rawDataDao = rawDataDao;
         this.producerService = producerService;
         this.appUserDao = appUserDao;
         this.fileService = fileService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class MainServiceImpl implements MainService {
         } else if (BASIC_STATE.equals(userState)) {
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            //TODO добавить обработку email пользователя
+            output = appUserService.setEmail(appUser, text);
         } else {
             log.error("Unknown user state" + userState);
             output = "Неизвестная ошибка! Введите /cancel и повторите снова.";
@@ -101,7 +105,8 @@ public class MainServiceImpl implements MainService {
     private boolean isNotAllowSendContent(Long chatId, AppUser appUser) {
         var userState = appUser.getState();
         if (!appUser.getIsActive()) {
-            var error = "Зарегистрируйтесь или подтвердите почту по ссылке на почту для загрузки контента";
+            var error = "Зарегистрируйтесь или подтвердите почту по ссылке отправленную" +
+                    " на почту для загрузки контента или введите /help";
             sendAnswer(error, chatId);
             return true;
         } else if (!BASIC_STATE.equals(userState)) {
@@ -147,12 +152,12 @@ public class MainServiceImpl implements MainService {
      * обработка входящик команд от бота
      */
     private String processServiceCommand(AppUser appUser, String cmd) {
-        if (REGISTRATION.equals(cmd)) {
-            //TODO функионал не создан, добавить регистрацию
-            return "Временно не доступен";
-        } else if (HELP.equals(cmd)) {
+        var serviceCommand = ServiceCommands.fromValue(cmd);
+        if (REGISTRATION.equals(serviceCommand)) {
+            return appUserService.registerUser(appUser);
+        } else if (HELP.equals(serviceCommand)) {
             return help();
-        } else if (START.equals(cmd)) {
+        } else if (START.equals(serviceCommand)) {
             return "Приветствуем! Доступный список команд введите /help";
         } else {
             return "Неизвестная команда! Доступный список команд введите /help";
@@ -192,8 +197,8 @@ public class MainServiceImpl implements MainService {
      */
     private AppUser findOrSaveAppUser(Update update) {
         User telegramUser = update.getMessage().getFrom();
-        AppUser persistansAppUser = appUserDao.findAppUserByTelegramUserId(telegramUser.getId());
-        if(persistansAppUser == null) {
+        var persistansAppUser = appUserDao.findByTelegramUserId(telegramUser.getId());
+        if(persistansAppUser.isEmpty()) {
             //пользователь не найден, предстоящее сохранение
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
@@ -201,11 +206,12 @@ public class MainServiceImpl implements MainService {
                     .firstName(telegramUser.getFirstName())
                     .lastName(telegramUser.getLastName())
                     //TODO изменить значение
-                    .isActive(true)
+                    //TODO ИСПАРВЛЕНО
+                    .isActive(false)
                     .state(BASIC_STATE)
                     .build();
             return appUserDao.save(transientAppUser);
         }
-        return persistansAppUser;
+        return persistansAppUser.get();
     }
 }
