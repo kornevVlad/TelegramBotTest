@@ -13,14 +13,14 @@ import static org.example.RabbitQueue.DOC_MASSAGE_UPDATE;
 
 @Component
 @Log4j
-public class UpdateController {
+public class UpdateProcessor {
 
     private TelegramBot telegramBot;
     private final MassageUtils massageUtils;
 
     private final UpdateProducer updateProducer;
 
-    public UpdateController(MassageUtils massageUtils, UpdateProducer updateProducer) {
+    public UpdateProcessor(MassageUtils massageUtils, UpdateProducer updateProducer) {
         this.massageUtils = massageUtils;
         this.updateProducer = updateProducer;
     }
