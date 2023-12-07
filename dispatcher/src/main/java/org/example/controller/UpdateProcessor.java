@@ -13,14 +13,14 @@ import static org.example.RabbitQueue.DOC_MASSAGE_UPDATE;
 
 @Component
 @Log4j
-public class UpdateController {
+public class UpdateProcessor {
 
     private TelegramBot telegramBot;
     private final MassageUtils massageUtils;
 
     private final UpdateProducer updateProducer;
 
-    public UpdateController(MassageUtils massageUtils, UpdateProducer updateProducer) {
+    public UpdateProcessor(MassageUtils massageUtils, UpdateProducer updateProducer) {
         this.massageUtils = massageUtils;
         this.updateProducer = updateProducer;
     }
@@ -35,7 +35,7 @@ public class UpdateController {
             return;
         }
 
-        if (update.getMessage() != null) {
+        if (update.hasMessage()) {
             distributeMassageByType(update);
         } else {
             log.error("Unsupported type");
@@ -48,11 +48,11 @@ public class UpdateController {
     public void distributeMassageByType(Update update) {
         var massage = update.getMessage();
 
-        if (massage.getText() != null) {
+        if (massage.hasText()) {
             processTextMassage(update);
-        } else if (massage.getDocument() != null) {
+        } else if (massage.hasDocument()) {
             processDocumentMassage(update);
-        } else if (massage.getPhoto() != null) {
+        } else if (massage.hasPhoto()) {
             processPhotoMassage(update);
         } else {
             setUnsupportedMassageTypeView(update);

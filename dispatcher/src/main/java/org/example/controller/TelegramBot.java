@@ -1,19 +1,21 @@
 package org.example.controller;
 
 import lombok.extern.log4j.Log4j;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 
 import javax.annotation.PostConstruct;
 
 @Component
 @Log4j
-public class TelegramBot extends TelegramLongPollingBot {
+public class TelegramBot extends TelegramWebhookBot {
 
     @Value("${bot.name}") //подключение зависимости смотреть application.properties
     private String botName;
@@ -21,21 +23,27 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.token}") //подключение зависимости смотреть application.properties
     private String botToken;
 
-    private UpdateController updateController;
+    @Value("${bot.uri}")
+    private String botUri;
 
-    public TelegramBot(UpdateController updateController) {
-        this.updateController = updateController;
+    private UpdateProcessor updateProcessor;
+
+    public TelegramBot(UpdateProcessor updateProcessor) {
+        this.updateProcessor = updateProcessor;
     }
 
     @PostConstruct
     public void init() {
-        updateController.registerBot(this);
+        updateProcessor.registerBot(this);
+        try {
+            var setWebhook = SetWebhook.builder()
+                    .url(botUri)
+                    .build();
+            this.setWebhook(setWebhook);
+        } catch (TelegramApiException e) {
+            log.error(e);
+        }
     }
-
-    /**
-     * подключение ручного логгера, изменяем на бибилиотеку Lombok
-     * private static final Logger log = Logger.getLogger(TelegramBot.class);
-     */
 
     /**
      * Возращаем userName для авторизации в Telegram
@@ -50,25 +58,12 @@ public class TelegramBot extends TelegramLongPollingBot {
      */
     @Override
     public String getBotToken() {
-       return botToken;
+           return botToken;
     }
 
-    /**
-     * Информация о полученном сообщении из Telegram
-     * И ответное сообщение на входящее
-     */
     @Override
-    public void onUpdateReceived(Update update) {
-        updateController.processUpdate(update);
-        /**
-        var originalMessage = update.getMessage();
-        log.debug(originalMessage.getText());
-
-        var response = new SendMessage();
-        response.setChatId(originalMessage.getChatId().toString());
-        response.setText("Hello, I'm Telegram Bot");
-        sendAnswerMessage(response);
-         */
+    public String getBotPath() {
+        return "/update";
     }
 
     public void sendAnswerMessage(SendMessage message) {
@@ -79,5 +74,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                 log.error(e);
             }
         }
+    }
+
+    @Override
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+        return null;
     }
 }
